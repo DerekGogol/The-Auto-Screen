@@ -1,0 +1,44 @@
+The Auto Screen Turn On & Off source code README
+------------------------------------------------
+
+This is part of the source code from my app, The Auto Screen Turn On & Off, which turns device's screen on
+and off automatically as the user either picks it up or puts it back on a flat (horizontal) surface such as
+a table or desk.  I was only able to test it on two phones and two tablets, however, according to the
+received user feedback, the app works well on most Android phones and tablets.
+
+Below I listed file names and description of functionality I implemented in them.
+
+DisplayDialogPage.java:
+
+    Displays "Touch to keep Screen ON" button when the device is placed in horizontal position.  It will
+    allow user to keep the screen on by touching the button, otherwise the screen will be turned off.
+    Interestingly, this dialog establishes connection with SensorServiceOff, and if the button is touched
+    by user, DialogWasTouched() method inside SensorServiceOff is called, canceling pending screen off
+    event.
+
+ScreenReceiver.java:
+
+    This is Broadcast Receiver that intercepts ACTION_SCREEN_ON and ACTION_SCREEN_OFF events and handles
+    them accordingly.  Depending on which of the two events is received, it will stop one service and
+    start another.  I divided the logic into two services which run interchangeably.  One service runs
+    when the screen is on and watches for certain conditions to turn the screen off.  The second service
+    runs when the screen is off and watches for conditions to turn the screen on.  When the conditions
+    are met, these services will turn the screen on or off.
+
+SensorServiceOff.java:
+
+    This is one of the two services mentioned above. It runs when the screen is on and watches for conditions
+    that occur when the screen should be turned off. Namely, when the accelerometer sensor data indicates
+    that the device has been placed in horizontal position, or proximity sensor indicates that the device
+    is inside a pocket or handbag, this service will turn device's screen off.
+
+StartAutoScreenAtBootReceiver.java:
+
+    This is Broadcast Receiver that intercepts BOOT_COMPLETED event and starts service, if user preferences
+    indicate that it should be started when the device is rebooted.
+
+TheAutoScreen.java:
+
+    This Activity will set the checkboxes accordingly to saved user preferences.  It also watches for user
+    input, and sets user preferences.  If user touches "Start Service" or "Stop Service" buttons, this
+    Activity will either try to start or stop the service.
